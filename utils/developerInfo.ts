@@ -3,7 +3,7 @@ import type { DeveloperInfo } from "~/interface/DeveloperInfo";
 export const developerInfo: DeveloperInfo = {
   name: 'John Doe',
   title: 'Full Stack Developer',
-  skills: ['JavaScript', 'Vue.js', 'Node.js', 'Python', 'SQL'],
+  skills: ['JavaScript', 'Vue.js', 'Node.js', 'Python', 'MongoDb', 'Typescript'],
   experience: [
     { company: 'Tech Corp', role: 'Senior Developer', period: '2020-Present' },
     { company: 'StartUp Inc', role: 'Full Stack Developer', period: '2018-2020' },
