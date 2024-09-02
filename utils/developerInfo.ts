@@ -1,7 +1,7 @@
 import type { DeveloperInfo } from "~/interface/DeveloperInfo";
 
 export const developerInfo: DeveloperInfo = {
-  name: 'John Doe',
+  name: 'Diego Reyes | yeyodev',
   title: 'Full Stack Developer',
   skills: ['JavaScript', 'Vue.js', 'Node.js', 'Python', 'MongoDb', 'Typescript', 'OpenAi'],
   experience: [
@@ -10,7 +10,7 @@ export const developerInfo: DeveloperInfo = {
   ],
   projects: [
     { name: 'E-commerce Platform', tech: ['Vue.js', 'Node.js', 'MongoDB'] },
-    { name: 'Task Management App', tech: ['React', 'Firebase'] },
+    { name: 'Task Management App', tech: ['Nuxt', 'MongoDB'] },
   ],
   contact: {
     email: 'yeyodev@icloud.com',
