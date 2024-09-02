@@ -1,84 +1,51 @@
-<script setup>
-import { ref, onMounted, nextTick } from 'vue';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
 
-const outputLines = ref([]);
+import { handleCommand, typeWriter, scrollToBottom } from '@/utils/terminalUtils';
+
+const outputLines = ref<string[]>([]);
 const currentInput = ref('');
 const isTyping = ref(false);
-const terminalContent = ref(null);
+const terminalContent = ref<HTMLElement | null>(null);
 
-const developerInfo = {
-  name: 'John Doe',
-  title: 'Full Stack Developer',
-  skills: ['JavaScript', 'Vue.js', 'Node.js', 'Python', 'SQL'],
-  experience: [
-    { company: 'Tech Corp', role: 'Senior Developer', period: '2020-Present' },
-    { company: 'StartUp Inc', role: 'Full Stack Developer', period: '2018-2020' }
-  ],
-  projects: [
-    { name: 'E-commerce Platform', tech: ['Vue.js', 'Node.js', 'MongoDB'] },
-    { name: 'Task Management App', tech: ['React', 'Firebase'] }
-  ],
-  contact: {
-    email: 'john.doe@example.com',
-    github: 'github.com/johndoe',
-    linkedin: 'linkedin.com/in/johndoe'
-  }
-};
-
-const commands = {
-  help: () => `Available commands: ${Object.keys(commands).join(', ')}`,
-  about: () => `Hi, I'm ${developerInfo.name}, a ${developerInfo.title}.`,
-  skills: () => `My skills include: ${developerInfo.skills.join(', ')}`,
-  experience: () => developerInfo.experience.map(exp => `${exp.role} at ${exp.company} (${exp.period})`).join('<br>'),
-  projects: () => developerInfo.projects.map(proj => `${proj.name} - Technologies: ${proj.tech.join(', ')}`).join('<br>'),
-  contact: () => `Email: ${developerInfo.contact.email}<br>GitHub: ${developerInfo.contact.github}<br>LinkedIn: ${developerInfo.contact.linkedin}`,
-  clear: () => {
+const commands: Record<string, () => string> = {
+  help: function(): string {
+    return `Available commands: ${Object.keys(commands).join(', ')}`;
+  },
+  about: function(): string {
+    return `Hi, I'm ${developerInfo.name}, a ${developerInfo.title}.`;
+  },
+  skills: function(): string {
+    return `My skills include: ${developerInfo.skills.join(', ')}`;
+  },
+  experience: function(): string {
+    return developerInfo.experience.map(exp => `${exp.role} at ${exp.company} (${exp.period})`).join('<br>');
+  },
+  projects: function(): string {
+    return developerInfo.projects.map(proj => `${proj.name} - Technologies: ${proj.tech.join(', ')}`).join('<br>');
+  },
+  contact: function(): string {
+    return `Email: ${developerInfo.contact.email}<br>GitHub: ${developerInfo.contact.github}<br>LinkedIn: ${developerInfo.contact.linkedin}`;
+  },
+  clear: function(): string {
     outputLines.value = [];
     return '';
   }
 };
 
-const handleCommand = async () => {
-  const command = currentInput.value.toLowerCase().trim();
-  outputLines.value.push(`${currentInput.value}`);
-  currentInput.value = '';
-  isTyping.value = true;
-
-  if (commands[command]) {
-    await typeWriter(commands[command]());
-  } else {
-    await typeWriter(`Command not found. Type 'help' for available commands.`);
-  }
-
-  isTyping.value = false;
-  scrollToBottom();
-};
-
-const typeWriter = async (text) => {
-  const words = text.split(' ');
-  let result = '';
-  for (const word of words) {
-    result += word + ' ';
-    outputLines.value.push(result);
-    await new Promise(resolve => setTimeout(resolve, 50));
-  }
-};
-
-const scrollToBottom = () => {
-  nextTick(() => {
-    if (terminalContent.value) {
-      terminalContent.value.scrollTop = terminalContent.value.scrollHeight;
-    }
-  });
-};
+async function handleCommandInput(): Promise<void> {
+  await handleCommand(currentInput, outputLines, isTyping, commands, (text) => typeWriter(text, outputLines), () =>
+    scrollToBottom(terminalContent)
+  );
+}
 
 onMounted(async () => {
-  await typeWriter("Welcome to my interactive portfolio! Type 'help' to see available commands.");
+  await typeWriter("Welcome to my interactive portfolio! Type 'help' to see available commands.", outputLines);
 });
 </script>
 
 <template>
-  <div class="min-h-screen bg-black text-green-400 p-4 font-mono">
+  <div class="min-h-screen bg-black text-green-400 p-4 font-mono flex justify-center items-center">
     <div class="container mx-auto">
       <div class="terminal-window bg-gray-900 rounded-lg p-4 shadow-lg">
         <div class="terminal-header flex justify-between items-center mb-4">
@@ -98,7 +65,7 @@ onMounted(async () => {
             <span class="text-blue-400">$ </span>
             <input
               v-model="currentInput"
-              @keyup.enter="handleCommand"
+              @keyup.enter="handleCommandInput"
               type="text"
               class="bg-transparent border-none outline-none flex-grow ml-2"
               :disabled="isTyping"
@@ -109,6 +76,7 @@ onMounted(async () => {
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .terminal-window {
